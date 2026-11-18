@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SignBridge AI — Real-Time Sign Language &amp; Voice Translator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <!-- Ambient Aurora Background -->
+  <div class="aurora-bg" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <div class="app-shell">
+    <!-- Top Header -->
+    <header class="topbar glass">
+      <div class="brand">
+        <!-- Friendly AI Robot Mascot (inspired by poster) -->
+        <div class="mascot-wrap" id="mascotWrap" title="SignBridge AI Assistant">
+          <svg class="mascot-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line x1="32" y1="5" x2="32" y2="13" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+            <circle class="mascot-antenna" cx="32" cy="4.5" r="3.5" fill="#facc15"/>
+            <rect x="11" y="13" width="42" height="31" rx="14" fill="url(#robotHead)" stroke="#93c5fd" stroke-width="2"/>
+            <rect x="17" y="19" width="30" height="19" rx="8" fill="#0b1224"/>
+            <path class="mascot-eye" d="M22.5 29C22.5 26.5 26.5 26.5 26.5 29" stroke="#38bdf8" stroke-width="2.8" stroke-linecap="round"/>
+            <path class="mascot-eye" d="M37.5 29C37.5 26.5 41.5 26.5 41.5 29" stroke="#38bdf8" stroke-width="2.8" stroke-linecap="round"/>
+            <path d="M28.5 33.5C30 35.2 34 35.2 35.5 33.5" stroke="#4ade80" stroke-width="2.2" stroke-linecap="round"/>
+            <rect x="5.5" y="23" width="5" height="11" rx="2.5" fill="#60a5fa"/>
+            <rect x="53.5" y="23" width="5" height="11" rx="2.5" fill="#60a5fa"/>
+            <rect x="20" y="46" width="24" height="13" rx="6" fill="url(#robotBody)" stroke="#93c5fd" stroke-width="1.8"/>
+            <text x="32" y="55.5" text-anchor="middle" fill="#e0f2fe" font-family="Outfit, sans-serif" font-weight="800" font-size="9">AI</text>
+            <defs>
+              <linearGradient id="robotHead" x1="11" y1="13" x2="53" y2="44" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#f8fafc"/>
+                <stop offset="1" stop-color="#bfdbfe"/>
+              </linearGradient>
+              <linearGradient id="robotBody" x1="20" y1="46" x2="44" y2="59" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#2563eb"/>
+                <stop offset="1" stop-color="#7c3aed"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>SignBridge <span class="gradient-text">AI</span></h1>
+          <p class="tagline">Bridging Communication with AI · Sign Language for an Inclusive World</p>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="status-pill" id="connectionPill">
+          <span class="status-dot"></span>
+          <span id="connectionText">Connecting AI...</span>
+        </div>
+
+        <button class="btn btn-soft" id="btnToggleSkeleton" title="Toggle Neon Hand Landmarks">
+          <span class="btn-icon">✨</span>
+          <span>Landmarks</span>
+        </button>
+
+        <button class="btn btn-soft" id="btnToggleMirror" title="Mirror Webcam">
+          <span class="btn-icon">🪞</span>
+          <span>Mirror</span>
+        </button>
+
+        <button class="btn btn-soft" id="btnVoiceSettings" title="Voice Studio Settings">
+          <span class="btn-icon">🎙️</span>
+          <span>Voice Studio</span>
+        </button>
+
+        <button class="btn btn-primary" id="btnOpenTrainer" title="Teach Custom Hand Gestures">
+          <span class="btn-icon">🧠</span>
+          <span>Teach AI</span>
+        </button>
+
+        <button class="btn btn-icon-only" id="btnTheme" title="Switch Theme" aria-label="Toggle theme">
+          <span id="themeIcon">☀️</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main 3-Column Bento Workspace -->
+    <main class="workspace-grid">
+      <!-- LEFT COLUMN: 5-Step Live AI Pipeline (mirrors poster left panel) -->
+      <aside class="panel glass pipeline-panel">
+        <div class="panel-header">
+          <div>
+            <span class="eyebrow">LIVE ARCHITECTURE</span>
+            <h2>How AI Understands Sign Language?</h2>
+          </div>
+        </div>
+
+        <ol class="pipeline-steps" id="pipelineSteps">
+          <li class="pipe-step" data-step="1" id="step1">
+            <div class="step-num">1</div>
+            <div class="step-icon">📷</div>
+            <div class="step-body">
+              <div class="step-title">Camera Input</div>
+              <div class="step-desc">Capture hand gesture using webcam</div>
+              <div class="step-metric" id="metricStep1">Initializing camera...</div>
+            </div>
+            <span class="step-led"></span>
+          </li>
+
+          <li class="pipe-connector" id="conn1"></li>
+
+          <li class="pipe-step" data-step="2" id="step2">
+            <div class="step-num">2</div>
+            <div class="step-icon">🖐️</div>
+            <div class="step-body">
+              <div class="step-title">Hand Detection</div>
+              <div class="step-desc">Computer vision tracks 21 landmarks</div>
+              <div class="step-metric" id="metricStep2">Scanning for hands...</div>
+            </div>
+            <span class="step-led"></span>
+          </li>
+
+          <li class="pipe-connector" id="conn2"></li>
+
+          <li class="pipe-step" data-step="3" id="step3">
+            <div class="step-num">3</div>
+            <div class="step-icon">🧠</div>
+            <div class="step-body">
+              <div class="step-title">AI Model</div>
+              <div class="step-desc">Recognize gesture using trained ML model</div>
+              <div class="step-metric" id="metricStep3">RandomForest · Ready</div>
+            </div>
+            <span class="step-led"></span>
+          </li>
+
+          <li class="pipe-connector" id="conn3"></li>
+
+          <li class="pipe-step" data-step="4" id="step4">
+            <div class="step-num">4</div>
+            <div class="step-icon">💬</div>
+            <div class="step-body">
+              <div class="step-title">Prediction</div>
+              <div class="step-desc">Get the meaning (Word / Sentence)</div>
+              <div class="step-metric" id="metricStep4">Awaiting gesture</div>
+            </div>
+            <span class="step-led"></span>
+          </li>
+
+          <li class="pipe-connector" id="conn4"></li>
+
+          <li class="pipe-step" data-step="5" id="step5">
+            <div class="step-num">5</div>
+            <div class="step-icon">🔊</div>
+            <div class="step-body">
+              <div class="step-title">Display &amp; Voice</div>
+              <div class="step-desc">Show text on screen &amp; speak aloud</div>
+              <div class="step-metric" id="metricStep5">Voice Ready</div>
+            </div>
+            <span class="step-led"></span>
+          </li>
+        </ol>
+
+        <!-- Recent History Log -->
+        <div class="history-card">
+          <div class="history-header">
+            <span>Recent Translations</span>
+            <button class="text-btn" id="btnClearHistory">Clear</button>
+          </div>
+          <div class="history-list" id="historyList">
+            <div class="empty-hint">Perform any sign or click a card on the right to begin.</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- CENTER COLUMN: HD Camera Feed + Floating Prediction HUD + Sentence Builder -->
+      <section class="center-stage">
+        <!-- Camera Card -->
+        <div class="camera-card glass" id="cameraCard">
+          <div class="camera-hud-top">
+            <div class="hud-left">
+              <span class="live-badge" id="liveBadge"><span class="pulse-dot"></span> LIVE CAM</span>
+              <span class="hud-chip" id="fpsChip">0 FPS</span>
+              <span class="hud-chip" id="handsChip">0 Hands</span>
+            </div>
+            <div class="hud-right">
+              <button class="hud-pill-btn" id="btnCameraToggle" title="Pause / Resume Camera">⏸️ Pause</button>
+              <button class="hud-pill-btn active" id="btnVoiceQuick" title="Toggle Voice Output">🔊 Voice ON</button>
+            </div>
+          </div>
+
+          <div class="video-container">
+            <img id="videoStream" src="/video_feed" alt="Live AI Sign Language Webcam Feed" />
+            <div class="video-fallback hidden" id="videoFallback">
+              <div class="fallback-icon">📷</div>
+              <h3>Camera Unavailable or Paused</h3>
+              <p>Connect a webcam or click any sign card on the right to test live screen &amp; voice output.</p>
+              <button class="btn btn-primary" id="btnRetryCamera">Reconnect Camera</button>
+            </div>
+
+            <!-- Corner Scanning Reticle -->
+            <div class="scan-corners" aria-hidden="true">
+              <span></span><span></span><span></span><span></span>
+            </div>
+
+            <!-- Floating Glass Output HUD -->
+            <div class="prediction-hud" id="predictionHud">
+              <div class="pred-emoji" id="predEmoji">🤖</div>
+              <div class="pred-content">
+                <div class="pred-label-row">
+                  <span class="pred-word" id="predWord">Show a Hand Sign</span>
+                  <span class="pred-conf" id="predConf">--%</span>
+                </div>
+                <div class="pred-phrase" id="predPhrase">Hold any of the 9 signs steady in front of your webcam</div>
+                <div class="conf-bar-track">
+                  <div class="conf-bar-fill" id="confBarFill"></div>
+                </div>
+              </div>
+              <div class="voice-visualizer" id="voiceVisualizer" title="Voice Output Active">
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <button class="replay-btn" id="btnReplaySpeech" title="Speak current sign again">🔊</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Confidence Distribution + Quick Voice Strip -->
+        <div class="telemetry-strip glass">
+          <div class="prob-section">
+            <div class="strip-label">AI Model Live Confidence</div>
+            <div class="prob-bars" id="probBars">
+              <div class="empty-hint">Waiting for hand detection...</div>
+            </div>
+          </div>
+
+          <div class="voice-quick-controls">
+            <div class="strip-label">Voice Output Engine</div>
+            <div class="segmented" id="voiceEngineSeg">
+              <button class="seg-btn active" data-engine="browser">🌐 Browser Voice</button>
+              <button class="seg-btn" data-engine="python">🐍 Python TTS</button>
+            </div>
+            <div class="voice-sub-options">
+              <label class="toggle-chip">
+                <input type="checkbox" id="chkFullPhrase" checked />
+                <span>Full Spoken Phrase</span>
+              </label>
+              <label class="toggle-chip">
+                <input type="checkbox" id="chkAutoSentence" checked />
+                <span>Auto-Build Sentence</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sentence Builder Bar -->
+        <div class="sentence-card glass">
+          <div class="sentence-top">
+            <div>
+              <span class="eyebrow">SMART SENTENCE BUILDER</span>
+              <h3>Spoken Message Composer</h3>
+            </div>
+            <div class="sentence-actions">
+              <button class="btn btn-primary btn-sm" id="btnSpeakSentence">🔊 Speak Sentence</button>
+              <button class="btn btn-soft btn-sm" id="btnCopySentence">📋 Copy</button>
+              <button class="btn btn-soft btn-sm" id="btnUndoWord">↩️ Undo</button>
+              <button class="btn btn-soft btn-sm" id="btnClearSentence">🗑️ Clear</button>
+            </div>
+          </div>
+          <div class="sentence-box" id="sentenceBox">
+            <span class="sentence-placeholder">Detected signs will form a sentence here — e.g. "Hello · Please · Help · Thank You"</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: 3x3 Interactive Sign Reference Poster -->
+      <aside class="panel glass signs-panel">
+        <div class="panel-header">
+          <div>
+            <span class="eyebrow">INTERACTIVE GUIDE · CLICK TO SPEAK</span>
+            <h2>Common Hand Signs &amp; Their Meanings</h2>
+          </div>
+        </div>
+
+        <div class="signs-grid" id="signsGrid">
+          <!-- Populated dynamically from /api/signs -->
+        </div>
+
+        <div class="tip-banner" id="activeSignTip">
+          <div class="tip-icon">💡</div>
+          <div class="tip-text">
+            <strong>Pro Tip:</strong> Good lighting helps AI detect all 21 hand landmarks instantly. Click any card above to hear &amp; preview its output!
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- MODAL: Teach AI (Live Custom Sample Collector & Retrainer) -->
+  <div class="modal-backdrop hidden" id="trainerModal">
+    <div class="modal glass">
+      <div class="modal-header">
+        <div>
+          <span class="eyebrow">INTERACTIVE MACHINE LEARNING</span>
+          <h2>🧠 Teach AI Your Hand Style</h2>
+        </div>
+        <button class="btn btn-icon-only" id="btnCloseTrainer">✕</button>
+      </div>
+      <p class="modal-desc">
+        Hold a sign in front of the webcam, select the sign below, and capture samples to personalize and retrain the local <code>RandomForestClassifier</code> model in real time.
+      </p>
+
+      <div class="trainer-controls">
+        <label class="field-label" for="trainerSignSelect">Select Sign to Calibrate</label>
+        <select id="trainerSignSelect" class="select-input"></select>
+
+        <div class="trainer-buttons">
+          <button class="btn btn-soft" id="btnCaptureOne">📸 Capture 1 Sample</button>
+          <button class="btn btn-primary" id="btnCaptureBurst">⚡ Capture 8 Samples (Burst)</button>
+        </div>
+
+        <div class="trainer-status" id="trainerStatus">Ready to record hand landmarks from live camera.</div>
+
+        <div class="trainer-counts" id="trainerCounts"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-soft" id="btnResetSamples">Reset Custom Samples</button>
+        <button class="btn btn-primary" id="btnRetrainModel">🚀 Retrain AI Model Now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Voice Studio Settings -->
+  <div class="modal-backdrop hidden" id="voiceModal">
+    <div class="modal glass">
+      <div class="modal-header">
+        <div>
+          <span class="eyebrow">AUDIO SYNTHESIS STUDIO</span>
+          <h2>🎙️ Voice Output Settings</h2>
+        </div>
+        <button class="btn btn-icon-only" id="btnCloseVoice">✕</button>
+      </div>
+
+      <div class="voice-form">
+        <div class="form-group">
+          <label class="field-label" for="voiceSelect">Browser Speech Voice</label>
+          <select id="voiceSelect" class="select-input"></select>
+        </div>
+
+        <div class="form-group">
+          <label class="field-label">Speech Speed: <strong id="rateVal">1.0x</strong></label>
+          <input type="range" id="rateSlider" min="0.7" max="1.5" step="0.05" value="1.0" />
+        </div>
+
+        <div class="form-group">
+          <label class="field-label">Voice Pitch: <strong id="pitchVal">1.0</strong></label>
+          <input type="range" id="pitchSlider" min="0.7" max="1.4" step="0.05" value="1.0" />
+        </div>
+
+        <div class="form-group">
+          <label class="field-label">Auto-Speak Cooldown: <strong id="cooldownVal">2.8s</strong></label>
+          <input type="range" id="cooldownSlider" min="1.2" max="6.0" step="0.2" value="2.8" />
+        </div>
+
+        <div class="python-tts-info" id="pythonTtsInfo">
+          Python Local Voice Engine: checking...
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-soft" id="btnTestVoice">🔊 Test Voice Now</button>
+        <button class="btn btn-primary" id="btnSaveVoice">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast hidden" id="toast"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
